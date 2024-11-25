@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menina Moça</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Supabase - Importante: deve vir antes dos nossos scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Nossos scripts - Importante: sem type="module" -->
+    <script>
+        // Configuração do Supabase
+        const supabaseClient = supabase.createClient(
+            'https://ixouszvipgklgdvmsyyw.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3VzenZpcGdrbGdkdm1zeXl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NTc5ODgsImV4cCI6MjA0NzQzMzk4OH0.FxsdlpIFDHk9NDHp8mKn06_M54WasfIuTWLgA1L_ip8'
+        );
+    </script>
+    <script src="script.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-pink-500 shadow-lg fixed w-full z-50 top-0 left-0 border-b-4 border-pink-300">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <div class="relative">
+                    <input 
+                        type="search" 
+                        id="searchInput"
+                        placeholder="Buscar produtos..." 
+                        class="px-4 py-2 pl-4 pr-12 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-400 w-64 font-quicksand"
+                        onkeyup="searchProducts(this.value)"
+                    >
+                    <button 
+                        onclick="buscarProduto()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-pink-500"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </button>
+                </div>
+                <h1 class="text-3xl font-bold text-white font-dancing">Menina Moça Makeup</h1>
+                <div class="flex items-center space-x-4">
+                    <button 
+                        onclick="abrirCarrinho()" 
+                        class="flex items-center text-white hover:text-pink-200 transition-colors relative"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Carrinho
+                        <span 
+                            id="carrinho-quantidade" 
+                            class="absolute -top-2 -right-2 bg-white text-pink-500 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
+                        >0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Categories Section -->
+    <div class="container mx-auto px-4 py-8 mt-20">
+        <div class="flex flex-wrap justify-center gap-6">
+            <!-- Todos -->
+            <div class="relative group">
+                <button onclick="carregarProdutos('todos')" class="category-btn active px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Todos
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+            </div>
+
+            <!-- Rosto -->
+            <div class="relative group">
+                <button class="category-btn px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Rosto
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute hidden group-hover:block w-48 bg-white shadow-lg rounded-lg mt-2 py-2 z-50">
+                    <a href="#" onclick="carregarProdutos('base')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Base</a>
+                    <a href="#" onclick="carregarProdutos('po')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Pó Compacto</a>
+                    <a href="#" onclick="carregarProdutos('blush')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Blush</a>
+                    <a href="#" onclick="carregarProdutos('iluminador')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Iluminador</a>
+                </div>
+            </div>
+
+            <!-- Olhos -->
+            <div class="relative group">
+                <button class="category-btn px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Olhos
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute hidden group-hover:block w-48 bg-white shadow-lg rounded-lg mt-2 py-2 z-50">
+                    <a href="#" onclick="carregarProdutos('Máscara de Cílios')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Máscara de Cílios</a>
+                    <a href="#" onclick="carregarProdutos('Delineador')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Delineador</a>
+                    <a href="#" onclick="carregarProdutos('Sombras')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Sombras</a>
+                    
+                </div>
+            </div>
+
+            <!-- Lábios -->
+            <div class="relative group">
+                <button class="category-btn px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Labios  
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute hidden group-hover:block w-48 bg-white shadow-lg rounded-lg mt-2 py-2 z-50">
+                    <a href="#" onclick="carregarProdutos('Batom')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Batom</a>
+                    <a href="#" onclick="carregarProdutos('gloss')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">gloss</a>
+                    
+                    
+                </div>
+            </div>
+
+            <!-- Cosméticos -->
+            <div class="relative group">
+                <button class="category-btn px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Cosméticos
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute hidden group-hover:block w-48 bg-white shadow-lg rounded-lg mt-2 py-2 z-50">
+                    <a href="#" onclick="carregarProdutos('shampoo')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">shampoo</a>
+                    <a href="#" onclick="carregarProdutos('condicionador')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">condicionador</a>
+                    <a href="#" onclick="carregarProdutos('tratamento')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">tratamento</a>
+                    
+                </div>
+            </div>
+
+            <!-- Acessórios -->
+            <div class="relative group">
+                <button class="category-btn px-6 py-2 text-gray-700 hover:text-pink-500 font-medium transition-colors">
+                    Acessórios
+                    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute hidden group-hover:block w-48 bg-white shadow-lg rounded-lg mt-2 py-2 z-50">
+                    <a href="#" onclick="carregarProdutos('pinceis')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Pinceis</a>
+                    <a href="#" onclick="carregarProdutos('necessaires')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Necessaires</a>
+                    <a href="#" onclick="carregarProdutos('espelhor')" class="block px-4 py-2 text-gray-700 hover:bg-pink-100">Espelho</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slideshow container -->
+    <div class="slideshow-container mt-8 relative container mx-auto px-4">
+        <!-- Slides -->
+        <div class="slide fade">
+            <img src="imagens/slide 1.jpg" class="w-full h-[500px] object-cover rounded-lg shadow-xl">
+        </div>
+
+        <div class="slide fade">
+            <img src="imagens/slide 2.jpg" class="w-full h-[500px] object-cover rounded-lg shadow-xl">
+        </div>
+
+        <div class="slide fade">
+            <img src="imagens/slide 3.jpg" class="w-full h-[500px] object-cover rounded-lg shadow-xl">
+        </div>
+
+        <!-- Botões de navegação -->
+        <button class="prev absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg hover:bg-opacity-75" onclick="mudarSlide(-1)">❮</button>
+        <button class="next absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg hover:bg-opacity-75" onclick="mudarSlide(1)">❯</button>
+
+        <!-- Indicadores -->
+        <div class="flex justify-center mt-4">
+            <span class="dot cursor-pointer mx-1" onclick="slideAtual(1)"></span>
+            <span class="dot cursor-pointer mx-1" onclick="slideAtual(2)"></span>
+            <span class="dot cursor-pointer mx-1" onclick="slideAtual(3)"></span>
+        </div>
+    </div>
+
+    <!-- Container para os produtos -->
+    <div class="container mx-auto px-4 mt-16">
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Produtos serão carregados aqui -->
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-wrap items-center gap-4">
+            <button  class="bg-pink-500 text-white px-6 py-2 rounded-full hover:bg-pink-500 transition-colors">
+                Filtrar por:
+            </button>
+            <div class="flex flex-wrap gap-3">
+                <select id="ordernarPor" onchange="aplicarFiltros()" class="px-4 py-2 rounded-full border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    <option value="" disabled selected>Selecionar</option>
+                    <option value="menor-preco">Menor Preço</option>
+                    <option value="maior-preco">Maior Preço</option>
+                    <option value="mais-vendidos">Mais Vendidos</option>
+                    <option value="novidades">Novidades</option>
+                    <option value="promocoes">Promoções</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adicione esta seção após o Filter Section -->
+    <div class="container mx-auto px-4">
+        <div id="produtos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Os produtos serão inseridos aqui dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Sidebar do Carrinho -->
+    <div id="carrinho-sidebar" class="fixed top-0 right-0 h-full w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <div class="p-6 h-full flex flex-col">
+            <!-- Cabeçalho do Carrinho -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold">Carrinho</h2>
+                <button onclick="fecharCarrinho()" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Conteúdo do Carrinho -->
+            <div id="carrinho-conteudo" class="flex-1 overflow-y-auto">
+                <!-- Os itens do carrinho serão inseridos aqui dinamicamente -->
+            </div>
+
+            <!-- Rodapé do Carrinho -->
+            <div class="border-t border-gray-200 pt-4 mt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span id="carrinho-total" class="text-lg font-bold text-pink-500">R$ 0,00</span>
+                </div>
+                <button 
+                    onclick="finalizarCompra()" 
+                    class="w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition-colors"
+                >
+                    Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
